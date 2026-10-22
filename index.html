@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>产后护理与宝宝养育日历</title>
+<style>
+:root{--main:#E8876B;--main-soft:#FBE9E2;--ink:#3A2E2A;--sub:#9A8B85;--bg:#FBF7F5;--card:#fff;--line:#F0E4DF;--warn:#D9534F;--chip:#F7E8E2;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{font-family:'PingFang SC','Helvetica Neue',sans-serif;background:var(--bg);color:var(--ink);max-width:520px;margin:0 auto;}
+.appbar{position:sticky;top:0;z-index:10;background:var(--main);color:#fff;padding:14px 16px 12px;border-radius:0 0 18px 18px;}
+.appbar h1{font-size:19px;font-weight:600;}
+.appbar .sub{font-size:12px;opacity:.85;margin-top:2px;}
+main{padding:12px 12px 84px;}
+.card{background:var(--card);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 1px 4px rgba(180,120,100,.08);}
+.card h3{font-size:15px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.card h3 .more{font-size:12px;color:var(--main);font-weight:400;}
+.bottomnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;background:#fff;display:flex;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:20;}
+.nav-item{flex:1;text-align:center;padding:8px 0 6px;color:var(--sub);font-size:11px;cursor:pointer;}
+.nav-item .ico{font-size:20px;display:block;line-height:1.2;}
+.nav-item.active{color:var(--main);font-weight:600;}
+.fab{position:fixed;right:16px;bottom:76px;width:52px;height:52px;border-radius:50%;background:var(--main);color:#fff;font-size:26px;border:none;box-shadow:0 4px 12px rgba(232,135,107,.4);z-index:15;cursor:pointer;}
+.sheet-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:30;}
+.sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;background:#fff;border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom));z-index:31;max-height:82vh;overflow:auto;}
+.sheet h2{font-size:16px;margin-bottom:12px;}
+.frow{margin-bottom:12px;}
+.frow label{display:block;font-size:13px;color:var(--sub);margin-bottom:5px;}
+.frow input,.frow select,.frow textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:15px;background:#FFFEFD;font-family:inherit;}
+.frow .err{color:var(--warn);font-size:12px;margin-top:4px;display:none;}
+.btn{display:block;width:100%;padding:12px;border:none;border-radius:12px;background:var(--main);color:#fff;font-size:16px;cursor:pointer;margin-top:6px;}
+.btn.ghost{background:var(--main-soft);color:var(--main);}
+.btn.sm{display:inline-block;width:auto;padding:8px 14px;font-size:13px;margin-top:0;}
+.quick{display:flex;gap:8px;margin-bottom:12px;}
+.quick button{flex:1;padding:10px 0;border:none;border-radius:12px;background:var(--main-soft);color:var(--main);font-size:13px;cursor:pointer;}
+.stat{display:flex;gap:8px;}
+.stat .s{flex:1;background:var(--main-soft);border-radius:12px;padding:10px;text-align:center;}
+.stat .s b{display:block;font-size:18px;color:var(--main);}
+.stat .s span{font-size:11px;color:var(--sub);}
+.banner{background:#FDECEA;border:1px solid #F5C6C0;color:#B03A34;border-radius:12px;padding:10px 12px;font-size:13px;margin-bottom:12px;cursor:pointer;}
+.list-item{display:flex;justify-content:space-between;align-items:center;padding:10px 4px;border-bottom:1px solid var(--line);font-size:14px;gap:8px;}
+.list-item:last-child{border-bottom:none;}
+.list-item .ops button{border:none;background:none;color:var(--warn);font-size:13px;cursor:pointer;padding:2px 4px;}
+.chip{display:inline-block;background:var(--chip);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--main);margin:2px 4px 2px 0;}
+.chip.free{background:#E8F4EC;color:#3E7D5C;}
+.chip.paid{background:#FBF0DC;color:#A2702A;}
+.empty{text-align:center;color:var(--sub);font-size:13px;padding:18px 0;}
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:rgba(58,46,42,.9);color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;z-index:99;}
+.seg{display:flex;background:var(--main-soft);border-radius:12px;padding:3px;margin-bottom:12px;}
+.seg button{flex:1;border:none;background:none;padding:8px 0;font-size:13px;color:var(--main);border-radius:10px;cursor:pointer;}
+.seg button.active{background:#fff;font-weight:600;}
+canvas{max-width:100%;}
+.wizard{padding:24px 20px;min-height:100vh;background:var(--bg);}
+.wizard h1{font-size:22px;margin-bottom:6px;color:var(--main);}
+.wizard p.tip{font-size:13px;color:var(--sub);margin-bottom:20px;}
+.checkline{display:flex;align-items:center;gap:8px;padding:8px 2px;font-size:14px;}
+.checkline input{width:18px;height:18px;accent-color:var(--main);}
+.checkline.done{color:var(--sub);text-decoration:line-through;}
+.article ul{margin:4px 0;}
+.article li{font-size:13px;color:#5C4F49;line-height:1.7;margin-left:18px;}
+.article h4{font-size:14px;margin:10px 0 2px;color:var(--ink);}
+.warn-note{font-size:11px;color:var(--sub);margin-top:8px;}
+</style>
+</head>
+<body>
+<div id="wizard"></div>
+<div id="app" hidden>
+  <header class="appbar"><h1 id="appTitle">今日</h1><div class="sub" id="appSub"></div></header>
+  <main>
+    <section class="screen" id="screen-home"></section>
+    <section class="screen" id="screen-records" hidden></section>
+    <section class="screen" id="screen-growth" hidden></section>
+    <section class="screen" id="screen-vaccine" hidden></section>
+    <section class="screen" id="screen-mom" hidden></section>
+  </main>
+  <nav class="bottomnav" id="bottomnav"></nav>
+  <button class="fab" id="fab">＋</button>
+  <div id="sheetRoot"></div>
+</div>
+<script id="data">
+// 数据来源：国家免疫规划程序；WHO 2006 生长标准（四舍五入到 0.1，仅供个人参考）
+window.DATA = {
+stages: [
+  {id:'p1',label:'月子第1周 · 排恶露期',dietFocus:'清淡易消化、稀软少油'},
+  {id:'p2',label:'月子第2周 · 修复期',dietFocus:'补血补铁、促子宫复旧'},
+  {id:'p3',label:'月子第3周 · 滋补期',dietFocus:'温补、催奶汤水'},
+  {id:'p4',label:'月子第4-6周 · 产褥后期',dietFocus:'强化营养、膳食纤维'},
+  {id:'p5',label:'哺乳期',dietFocus:'均衡催奶、控制体重'}
+],
+diet: {
+  p1: [
+    {breakfast:['小米红枣粥','蒸蛋羹','软馒头片'],lunch:['清蒸鲈鱼','软米饭','清炒小白菜(少油)'],dinner:['山药胡萝卜排骨汤','烂面条','白灼西兰花'],snack:['红糖小米粥','温水足量']},
+    {breakfast:['红糖桂圆小米粥','白煮蛋','藕粉糕'],lunch:['鲫鱼豆腐汤','软米饭','蒜蓉油麦菜'],dinner:['冬瓜玉米鸡汤','瘦肉蔬菜粥','蒸南瓜'],snack:['苹果泥','温牛奶']},
+    {breakfast:['山药瘦肉粥','水煮蛋','全麦吐司(软)'],lunch:['什锦蒸蛋','青菜瘦肉汤面','凉拌木耳(少许)'],dinner:['紫菜蛋花汤','三鲜馄饨','清炒菠菜'],snack:['红枣银耳羹']}
+  ],
+  p2: [
+    {breakfast:['麻油猪肝面线','水煮蛋','温豆浆'],lunch:['四物鸡汤','软米饭','清炒红苋菜'],dinner:['当归鲫鱼汤','杂粮饭','白灼秋葵'],snack:['酒酿蛋(煮透去酒精)','核桃仁']},
+    {breakfast:['红枣枸杞小米粥','蒸蛋羹','奶香馒头'],lunch:['菠菜猪肝汤','软米饭','蚝油生菜'],dinner:['莲藕花生排骨汤','红薯饭','清蒸鳕鱼'],snack:['温牛奶','香蕉']},
+    {breakfast:['黑芝麻糊','淡味茶叶蛋','软花卷'],lunch:['番茄牛腩汤','软米饭','上汤娃娃菜'],dinner:['黄花菜瘦肉汤','糙米软饭','清炒丝瓜'],snack:['银耳莲子羹']}
+  ],
+  p3: [
+    {breakfast:['花生红豆浆','鸡蛋软饼','蒸红薯'],lunch:['花生猪蹄汤','软米饭','姜炒芥蓝'],dinner:['通草鲫鱼汤','杂粮饭','麻油鸡'],snack:['温牛奶','蒸红枣']},
+    {breakfast:['酒酿圆子蛋','全麦三明治(软)'],lunch:['排骨海带汤','软米饭','清炒豆芽'],dinner:['乌鸡汤(红枣枸杞)','红薯饭','虾仁蒸蛋'],snack:['温木瓜牛奶','腰果']},
+    {breakfast:['小米南瓜粥','水煮蛋','青菜包'],lunch:['黄豆炖猪蹄','软米饭','蒜蓉西兰花'],dinner:['冬瓜羊肉汤(少量)','软米饭','清炒芦笋'],snack:['黑芝麻糊','樱桃']}
+  ],
+  p4: [
+    {breakfast:['牛奶燕麦','煎蛋','杂粮包'],lunch:['清炖鸡汤','杂粮饭','双色菜花'],dinner:['番茄龙利鱼','糙米软饭','蒜蓉茼蒿'],snack:['酸奶','蓝莓']},
+    {breakfast:['八宝粥','淡味茶叶蛋','蒸山药'],lunch:['萝卜炖牛腩','软米饭','清炒油麦菜'],dinner:['山药炖鸡汤','红薯饭','白灼基围虾'],snack:['温牛奶','苹果']},
+    {breakfast:['蔬菜瘦肉粥','鸡蛋软饼','拌豆腐(少许香油)'],lunch:['玉米排骨汤','杂粮饭','手撕包菜(少油)'],dinner:['香菇滑鸡粥','清蒸鲈鱼','凉拌黄瓜(室温)'],snack:['红豆汤','猕猴桃']}
+  ],
+  p5: [
+    {breakfast:['牛奶250ml+鸡蛋+全麦面包','均衡早餐'],lunch:['家常均衡餐','催奶汤一碗(鲫鱼/排骨/鸡汤轮换)'],dinner:['清蒸鱼或虾等优质蛋白','杂粮饭','两样蔬菜'],snack:['坚果一小把','水果一份','饮水2000ml']},
+    {breakfast:['杂粮粥+蛋+奶'],lunch:['海带黄豆猪蹄汤','米饭','时蔬'],dinner:['清蒸鱼+杂粮饭','绿叶菜'],snack:['温牛奶','香蕉或苹果']},
+    {breakfast:['豆浆+青菜包+蛋'],lunch:['牛腩炖萝卜','米饭','时蔬'],dinner:['乌鸡汤','红薯饭','清炒时蔬'],snack:['酸奶','核桃']}
+  ]
+},
+solids: [
+  {id:'s1',min:6,max:7,title:'6-7月 · 泥糊期',texture:'细腻泥糊，勺舀起可缓慢滴落',
+   principles:['每次只加一种新食物，观察3天有无过敏','由少到多、由稀到稠','1岁前不加盐糖蜂蜜','奶量仍为主，每日≥800ml'],
+   plans:[{main:'高铁米粉(上午，母乳/配方奶调配)',veg:'南瓜泥/红薯泥/西兰花泥轮换',fruit:'苹果泥/香蕉泥/牛油果泥',other:'满7月龄尝试蛋黄，从1/4开始'},
+          {main:'高铁米粉(第二餐渐进)',veg:'胡萝卜泥/土豆泥',fruit:'梨泥/桃泥(蒸熟)',other:'猪肝泥每周1-2次(少量)'}]},
+  {id:'s2',min:8,max:9,title:'8-9月 · 颗粒碎末期',texture:'碎末、小颗粒，可开始手指食物',
+   principles:['引入手指食物：蒸软胡萝卜条、香蕉条','肉末/肝泥补铁','新食物仍逐样观察3天','练习用杯子喝水'],
+   plans:[{main:'稠粥或烂面(2餐)',veg:'碎菜末',fruit:'软水果条',other:'肉末/鱼泥/肝泥轮换、蛋黄渐增至全蛋'},
+          {main:'软饭+汤',veg:'碎菜+番茄',fruit:'果泥或果条',other:'手指食物自主抓食'}]},
+  {id:'s3',min:10,max:12,title:'10-12月 · 小块期',texture:'小块、软饭，鼓励自主进食',
+   principles:['食物小块软烂，锻炼咀嚼','可吃全蛋、鱼肉(去刺)','固定餐位，鼓励自己抓勺','奶量每日600-800ml'],
+   plans:[{main:'软饭/小块面条',veg:'小块蒸菜',fruit:'水果块',other:'蒸鱼、肉丸、豆腐'},
+          {main:'小馄饨/软饭',veg:'时蔬小块',fruit:'水果条',other:'鸡蛋、虾(观察过敏)'}]},
+  {id:'s4',min:12,max:24,title:'1岁+ · 接近成人质地',texture:'软烂家常菜，仍需少盐',
+   principles:['仍少盐少糖，禁蜂蜜至1岁后可少量','牛奶/酸奶可作奶源','鼓励与家人同桌进餐','注意鱼刺、整粒坚果呛咳风险'],
+   plans:[{main:'软米饭',veg:'家常炒菜(少油盐)',fruit:'水果',other:'鱼/肉/蛋轮换，奶500ml左右'},
+          {main:'面条/饺子',veg:'时蔬',fruit:'水果',other:'豆制品、瘦肉，奶500ml左右'}]}
+],
+care: {
+  p1: {title:'产后第1周 · 排恶露期',
+    points:['观察恶露：产后3-4天为鲜红色恶露，之后渐淡；如大量血块、一小时浸透一片卫生巾，立即就医','早接触、早吸吮、按需哺乳，初乳很珍贵','多翻身、产后24小时内尽早下床活动，预防血栓（下床先坐起30秒防头晕）','会阴侧切者：便后温水冲洗，由前向后擦拭','忌盆浴，可擦浴；恶露期间保持外阴清洁干燥','每日监测体温，超过38℃需就医','多纤维饮食+足量饮水预防便秘，排便勿用力憋气','产后出汗多属正常（褥汗），及时补水换衣，避免直接吹风','情绪波动、想哭都是常见的，家人多陪伴；持续低落需求助'],
+    cSection:['伤口保持干燥清洁，淋浴后轻轻蘸干','咳嗽/打喷嚏/大笑时用手轻按伤口保护','腹带松紧适度，不影响呼吸为度，卧床时可松开','6-8周内不提比宝宝更重的物品','伤口红、肿、渗液、发热 → 立即就医']},
+  p2: {title:'产后第2周 · 修复期',
+    points:['恶露应转为淡红/浆液色，如再变鲜红且量多，警惕晚期产后出血','子宫继续复旧：哺乳时宫缩痛属正常','可开始凯格尔训练：收缩盆底肌3-5秒后放松，每天3组×10次','贫血妈妈继续补铁食补（猪肝、红肉、深色蔬菜）','每日步行量渐增，以不疲劳为度','预防乳头皲裂：纠正含接姿势（含住大部分乳晕），哺乳后涂羊脂膏','宝宝黄疸未退/加重需儿科随诊','白天碎片化补眠，与宝宝同睡同起'],
+    cSection:['观察伤口愈合：微红、变软属正常；硬结、跳痛、渗液需就诊','伤口未完全愈合前保持干燥，勿自行揭痂','可温水淋浴，时间不宜过长']},
+  p3: {title:'产后第3周 · 滋补期',
+    points:['催奶重在供需平衡：多吸多排空，汤水与哺乳配合（汤在哺乳前喝）','保证每餐有优质蛋白，汤去浮油防堵奶','保持心情放松，焦虑会抑制喷乳反射','警惕乳腺炎：乳房红肿热痛+发热≥38.5℃ → 就医','开始温和产褥操：腹式呼吸、抬腿，避免剧烈卷腹','产后6周内避免重体力与久蹲','宝宝肠绞痛高发期：飞机抱、白噪音、排气操可缓解','妈妈可短时外出散步，呼吸新鲜空气改善情绪']},
+  p4: {title:'产后第4-6周 · 产褥后期',
+    points:['盆底肌训练系统化：每天3组，持续3个月以上','产褥操进阶：猫式伸展、臀桥，仍避免大幅卷腹','预约产后42天复查（妈妈+宝宝都要查）','恶露一般6周内干净；超6周未净需就诊','产后月经可能未恢复，但仍可能排卵：注意避孕（哺乳期也需避孕）','体重管理起步：均衡饮食+步行，每周减重不超过0.5kg','关注腹直肌分离：仰卧抬腿自测指宽>2指需评估康复'],
+    cSection:['伤口完全愈合后（通常4-6周，遵医嘱）可开始硅酮凝胶/疤痕贴','疤痕按摩：指腹轻压疤痕画圈，每天2次×5分钟，坚持3-6个月','防粘连增生：下腹持续牵拉痛、疤痕变硬凸起发红发痒 → 疤痕专科就诊','疤痕防晒6-12个月，减少色沉','腹带渐停，改以核心训练支撑']},
+  p5: {title:'哺乳期 · 持续关注',
+    points:['均衡饮食+催奶汤水轮换，无需大补特补','咖啡因每日≤200mg（约1杯咖啡），酒后2-3小时内不哺乳','严格戒烟酒，避免吸入二手烟','逐步恢复运动：快走→产后瑜伽→核心训练，从低强度开始','产后脱发属正常（6-12个月自行恢复），勿焦虑','每月减重0.5-1kg为宜，过度节食影响奶量','重返职场前2周开始储奶与瓶喂适应训练','妈妈用药前查哺乳安全条目或咨询医生']}
+},
+safety: [
+  {cat:'退烧止痛',name:'对乙酰氨基酚(泰诺林)',level:'哺乳期可用',note:'退烧止痛首选，常规剂量安全'},
+  {cat:'退烧止痛',name:'布洛芬',level:'哺乳期可用',note:'注意胃部不适，随餐服用'},
+  {cat:'退烧止痛',name:'阿司匹林',level:'避免',note:'有瑞氏综合征风险，哺乳期不用'},
+  {cat:'抗生素',name:'青霉素类/头孢类',level:'相对安全',note:'遵医嘱使用，观察宝宝腹泻/鹅口疮'},
+  {cat:'抗生素',name:'喹诺酮类(左氧氟沙星等)',level:'避免',note:'影响宝宝软骨发育，哺乳期不用'},
+  {cat:'抗生素',name:'四环素类',level:'避免',note:'影响宝宝牙齿与骨骼'},
+  {cat:'抗生素',name:'甲硝唑',level:'慎用',note:'遵医嘱，单次大剂量后暂停哺乳12-24小时'},
+  {cat:'感冒',name:'复方感冒药',level:'慎用',note:'含伪麻黄碱可能减少奶量，尽量选单一成分'},
+  {cat:'感冒',name:'右美沙芬',level:'短期可用',note:'干咳短期使用，症状缓解即停'},
+  {cat:'感冒',name:'中成感冒药',level:'遵医嘱',note:'成分复杂，哺乳期使用前咨询医生'},
+  {cat:'日常',name:'咖啡因',level:'限量',note:'每日≤200mg，约一中杯咖啡'},
+  {cat:'日常',name:'酒精',level:'避免',note:'饮用后2-3小时内不哺乳，不醉酒哺乳'},
+  {cat:'日常',name:'吸烟(含二手烟)',level:'避免',note:'尼古丁入乳，影响宝宝呼吸与睡眠'},
+  {cat:'饮食',name:'韭菜/山楂/大麦茶',level:'因人而异',note:'传统认为回奶，可观察奶量变化'},
+  {cat:'饮食',name:'豆类/洋葱/花椰菜',level:'因人而异',note:'部分宝宝胀气敏感，观察排气与哭闹'},
+  {cat:'饮食',name:'深海大型鱼(剑鱼/鲨鱼)',level:'避免',note:'汞含量高；三文鱼等低汞鱼可适量'},
+  {cat:'检查用药',name:'含碘造影剂(CT增强)',level:'暂停哺乳',note:'检查后遵医嘱暂停24-48小时并排空乳房'},
+  {cat:'检查用药',name:'麻醉(小手术)',level:'遵医嘱',note:'多数麻醉代谢快，醒后通常可哺乳，术前告知哺乳期'},
+  {cat:'其他',name:'可待因类止咳药',level:'避免',note:'部分人超快代谢，乳汁浓度过高，哺乳期不用'},
+  {cat:'其他',name:'外用皮肤药(激素药膏)',level:'短期小面积可用',note:'弱中效激素小面积使用，避开乳房，遵医嘱'}
+],
+tasks: {
+  p1: [{id:'walk1',label:'下床走动10分钟'},{id:'water',label:'饮水1500ml+'},{id:'wound',label:'会阴/伤口清洁'},{id:'feedq',label:'按需哺乳8次+'}],
+  p2: [{id:'walk2',label:'步行增量'},{id:'kegel',label:'凯格尔训练3组'},{id:'water',label:'饮水充足'},{id:'nap',label:'午休30分钟'}],
+  p3: [{id:'kegel',label:'凯格尔训练3组'},{id:'soup',label:'催奶汤水1碗'},{id:'nap',label:'午休'},{id:'mood',label:'情绪自查/倾诉'}],
+  p4: [{id:'kegel',label:'盆底肌训练'},{id:'pex',label:'产褥操15分钟'},{id:'scar',label:'疤痕按摩5分钟',cOnly:true},{id:'chk42',label:'预约42天复查'}],
+  p5: [{id:'kegel',label:'盆底肌训练'},{id:'walk30',label:'快走30分钟'},{id:'water',label:'饮水2000ml'}]
+},
+vaccines: [
+  {key:'hepB-1',name:'乙肝疫苗 第1剂',month:0,dose:'1/3',type:'free',note:'出生24小时内接种'},
+  {key:'bcg',name:'卡介苗',month:0,dose:'1/1',type:'free',note:'预防结核，接种后局部可能出现小脓疡属正常'},
+  {key:'hepB-2',name:'乙肝疫苗 第2剂',month:1,dose:'2/3',type:'free',note:''},
+  {key:'ipv-1',name:'脊灰灭活(IPV) 第1剂',month:2,dose:'1/4',type:'free',note:''},
+  {key:'pentavalent-1',name:'五联疫苗 第1剂',month:2,dose:'1/4',type:'paid',note:'自费，可替代百白破+脊灰+Hib，减少注射次数'},
+  {key:'pcv13-1',name:'13价肺炎 第1剂',month:2,dose:'1/4',type:'paid',note:'自费，需在6月龄前完成基础3剂'},
+  {key:'rotavirus-1',name:'口服轮状 第1剂',month:2,dose:'1/3',type:'paid',note:'自费，注意接种窗口期，首剂须在特定周龄前'},
+  {key:'ipv-2',name:'脊灰灭活(IPV) 第2剂',month:3,dose:'2/4',type:'free',note:''},
+  {key:'pentavalent-2',name:'五联疫苗 第2剂',month:3,dose:'2/4',type:'paid',note:'自费'},
+  {key:'pentavalent-3',name:'五联疫苗 第3剂',month:4,dose:'3/4',type:'paid',note:'自费'},
+  {key:'pcv13-2',name:'13价肺炎 第2剂',month:4,dose:'2/4',type:'paid',note:'自费'},
+  {key:'rotavirus-2',name:'口服轮状 第2剂',month:4,dose:'2/3',type:'paid',note:'自费'},
+  {key:'bopv-3',name:'脊灰口服(bOPV) 第3剂',month:4,dose:'3/4',type:'free',note:''},
+  {key:'dtap-1',name:'百白破 第1剂',month:3,dose:'1/4',type:'free',note:''},
+  {key:'dtap-2',name:'百白破 第2剂',month:4,dose:'2/4',type:'free',note:''},
+  {key:'dtap-3',name:'百白破 第3剂',month:5,dose:'3/4',type:'free',note:''},
+  {key:'pcv13-3',name:'13价肺炎 第3剂',month:6,dose:'3/4',type:'paid',note:'自费'},
+  {key:'rotavirus-3',name:'口服轮状 第3剂',month:6,dose:'3/3',type:'paid',note:'自费'},
+  {key:'menA-1',name:'流脑A群 第1剂',month:6,dose:'1/2',type:'free',note:''},
+  {key:'hepB-3',name:'乙肝疫苗 第3剂',month:6,dose:'3/3',type:'free',note:''},
+  {key:'flu-1',name:'流感疫苗(每年)',month:6,dose:'年度',type:'paid',note:'自费，≥6月龄可种，首年2剂间隔4周，此后每年1剂'},
+  {key:'ev71-1',name:'手足口EV71 第1剂',month:6,dose:'1/2',type:'paid',note:'自费，2剂间隔1月，越早接种保护越好'},
+  {key:'menA-2',name:'流脑A群 第2剂',month:9,dose:'2/2',type:'free',note:''},
+  {key:'ev71-2',name:'手足口EV71 第2剂',month:7,dose:'2/2',type:'paid',note:'自费，与第1剂间隔1个月'},
+  {key:'mmr-1',name:'麻腮风 第1剂',month:8,dose:'1/2',type:'free',note:'接种后一周左右可能出现一过性发热/皮疹属常见反应'},
+  {key:'je-1',name:'乙脑减毒 第1剂',month:8,dose:'1/2',type:'free',note:''},
+  {key:'pcv13-4',name:'13价肺炎 加强剂',month:12,dose:'4/4',type:'paid',note:'自费'},
+  {key:'varicella-1',name:'水痘疫苗 第1剂',month:12,dose:'1/2',type:'paid',note:'自费（部分地区已纳入免费）'},
+  {key:'dtap-4',name:'百白破 加强',month:18,dose:'4/4',type:'free',note:''},
+  {key:'mmr-2',name:'麻腮风 第2剂',month:18,dose:'2/2',type:'free',note:''},
+  {key:'hepA-1',name:'甲肝减毒',month:18,dose:'1/1',type:'free',note:''},
+  {key:'pentavalent-4',name:'五联疫苗 加强',month:18,dose:'4/4',type:'paid',note:'自费'},
+  {key:'je-2',name:'乙脑减毒 第2剂',month:24,dose:'2/2',type:'free',note:''},
+  {key:'varicella-2',name:'水痘疫苗 第2剂',month:48,dose:'2/2',type:'paid',note:'4岁加强'},
+  {key:'menac-1',name:'流脑A+C 第1剂',month:36,dose:'1/2',type:'free',note:'3岁'},
+  {key:'bopv-4',name:'脊灰口服(bOPV) 第4剂',month:48,dose:'4/4',type:'free',note:'4岁'},
+  {key:'dt',name:'白破疫苗',month:72,dose:'1/1',type:'free',note:'6岁'},
+  {key:'menac-2',name:'流脑A+C 第2剂',month:72,dose:'2/2',type:'free',note:'6岁'}
+],
+who: {
+  girl: {
+    weight: {0:{p3:2.4,p25:2.8,p50:3.2,p75:3.7,p97:4.4},3:{p3:4.0,p25:4.8,p50:5.8,p75:6.2,p97:7.2},6:{p3:5.1,p25:6.1,p50:7.3,p75:8.0,p97:9.0},9:{p3:5.8,p25:6.9,p50:8.2,p75:9.0,p97:10.1},12:{p3:6.3,p25:7.6,p50:8.9,p75:9.9,p97:11.2},18:{p3:7.2,p25:8.6,p50:10.2,p75:11.4,p97:13.0},24:{p3:8.1,p25:9.7,p50:11.5,p75:12.9,p97:14.5}},
+    height: {0:{p3:45.6,p25:47.3,p50:49.1,p75:50.9,p97:52.7},3:{p3:55.0,p25:57.3,p50:59.8,p75:62.2,p97:64.2},6:{p3:59.9,p25:62.7,p50:65.6,p75:68.4,p97:70.0},9:{p3:63.7,p25:66.7,p50:69.9,p75:73.0,p97:73.9},12:{p3:67.0,p25:70.2,p50:73.7,p75:77.1,p97:77.5},18:{p3:75.3,p25:78.4,p50:80.2,p75:82.0,p97:85.1},24:{p3:81.0,p25:84.5,p50:86.4,p75:88.3,p97:91.8}}
+  },
+  boy: {
+    weight: {0:{p3:2.5,p25:2.9,p50:3.3,p75:3.9,p97:4.6},3:{p3:5.0,p25:5.7,p50:6.4,p75:7.1,p97:8.0},6:{p3:6.4,p25:7.1,p50:7.9,p75:8.6,p97:9.8},9:{p3:7.1,p25:8.0,p50:8.9,p75:9.6,p97:11.0},12:{p3:7.7,p25:8.6,p50:9.6,p75:10.3,p97:12.0},18:{p3:8.8,p25:9.7,p50:10.9,p75:11.7,p97:13.7},24:{p3:9.9,p25:10.9,p50:12.2,p75:13.0,p97:15.3}},
+    height: {0:{p3:46.1,p25:48.0,p50:49.9,p75:51.8,p97:53.7},3:{p3:56.7,p25:59.0,p50:61.4,p75:63.7,p97:66.2},6:{p3:63.0,p25:65.3,p50:67.6,p75:69.9,p97:72.3},9:{p3:66.5,p25:69.2,p50:72.0,p75:74.6,p97:76.8},12:{p3:70.0,p25:72.8,p50:75.7,p75:78.4,p97:80.7},18:{p3:75.0,p25:78.6,p50:82.3,p75:85.6,p97:87.5},24:{p3:79.9,p25:83.8,p50:87.8,p75:91.1,p97:92.9}}
+  }
+}
+};
+</script>
+<script id="logic">
+function parseDate(s){const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d);}
+function fmtDate(d){const p=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());}
+function todayStr(){return fmtDate(new Date());}
+function nowStr(){const p=n=>String(n).padStart(2,'0');const d=new Date();return fmtDate(d)+' '+p(d.getHours())+':'+p(d.getMinutes());}
+function parseDt(s){const [d,t]=s.split(' ');const [y,mo,da]=d.split('-').map(Number);const [h,mi]=t.split(':').map(Number);return new Date(y,mo-1,da,h,mi);}
+function fmtDt(d){const p=n=>String(n).padStart(2,'0');return fmtDate(d)+' '+p(d.getHours())+':'+p(d.getMinutes());}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+function daysBetween(fromStr,toStr){return Math.round((parseDate(toStr)-parseDate(fromStr))/86400000);}
+function ageInDays(birthStr,onStr){return daysBetween(birthStr,onStr);}
+function ageInMonths(birthStr,onStr){const b=parseDate(birthStr),o=parseDate(onStr);let m=(o.getFullYear()-b.getFullYear())*12+(o.getMonth()-b.getMonth());if(o.getDate()<b.getDate())m--;return m;}
+function addMonths(dateStr,n){const d=parseDate(dateStr);const day=d.getDate();d.setDate(1);d.setMonth(d.getMonth()+n);const last=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();d.setDate(Math.min(day,last));return fmtDate(d);}
+function ppStage(birthStr,onStr){
+  const d=ageInDays(birthStr,onStr);
+  const week=Math.floor(d/7)+1;
+  if(d<=6) return {id:'p1',label:'月子期 · 第1周',week};
+  if(d<=13) return {id:'p2',label:'月子期 · 第'+week+'周',week};
+  if(d<=20) return {id:'p3',label:'月子期 · 第'+week+'周',week};
+  if(d<=41) return {id:'p4',label:'月子期 · 第4-6周',week};
+  const m=ageInMonths(birthStr,onStr);
+  return {id:'p5',label:'哺乳期 · '+m+' 个月',week:null};
+}
+function feedingSum(feedings,date){
+  const list=feedings.filter(f=>f.dt.startsWith(date));
+  return {count:list.length, ml:list.reduce((s,f)=>s+(f.ml||0),0),
+    last:list.length?list.reduce((m,f)=>f.dt>m?f.dt:m,list[0].dt):null};
+}
+function lastNDays(n,onStr){const out=[];const base=parseDate(onStr);for(let i=n-1;i>=0;i--){out.push(fmtDate(new Date(base.getFullYear(),base.getMonth(),base.getDate()-i)));}return out;}
+function daySeries(dates,items,pick){return dates.map(d=>items.reduce((s,it)=>{const v=pick(it,d);return v==null?s:s+v;},0));}
+function sleepMin(startDt,endDt){return Math.round((parseDt(endDt)-parseDt(startDt))/60000);}
+function sleepDateKey(s){return s.start.slice(0,10);}
+function vaccineDueDate(birthStr,v){return addMonths(birthStr,v.month);}
+function vaccineStatus(v,rec,birthStr,onStr){
+  const dueDate=vaccineDueDate(birthStr,v);
+  if(rec&&rec.done)return {status:'done',dueDate};
+  const diff=daysBetween(onStr,dueDate); // >0 未到, <=0 已到
+  if(diff<=0)return {status:'due',dueDate};
+  if(diff<=7)return {status:'soon',dueDate};
+  return {status:'future',dueDate};
+}
+function whoPercentiles(who,gender,metric){
+  const t=who[gender][metric];
+  const ages=Object.keys(t).map(Number).sort((a,b)=>a-b);
+  const series={};
+  for(const p of ['p3','p25','p50','p75','p97'])series[p]=ages.map(a=>t[a][p]);
+  return {ages,series};
+}
+function dietPlan(diet,stageId,dateStr){const plans=diet[stageId];return plans[parseDate(dateStr).getDay()%plans.length];}
+function solidsStage(months,solids){if(months<6)return null;for(const s of solids){if(months>=s.min&&months<=s.max)return s;}return solids[solids.length-1];}
+window.L = {parseDate,fmtDate,todayStr,nowStr,parseDt,fmtDt,uid,daysBetween,ageInDays,ageInMonths,addMonths,ppStage,feedingSum,lastNDays,daySeries,sleepMin,sleepDateKey,vaccineDueDate,vaccineStatus,whoPercentiles,dietPlan,solidsStage};
+</script>
+<script id="store">
+window.Store = (function(){
+  const KEY='pp_app_v1', BAK='pp_app_v1_bak';
+  function blank(){return {profile:null,feedings:[],sleeps:[],diapers:[],growth:[],vaccineRecords:{},recovery:[],checks:{},foodLog:[],dietChoice:{}};}
+  const ARR=['feedings','sleeps','diapers','growth','recovery','foodLog'];
+  const OBJ=['vaccineRecords','checks','dietChoice'];
+  function validate(raw){
+    if(!raw||typeof raw!=='object'||Array.isArray(raw))return null;
+    const s=blank();
+    s.profile=(raw.profile&&typeof raw.profile==='object')?raw.profile:null;
+    for(const k of ARR)s[k]=Array.isArray(raw[k])?raw[k]:[];
+    for(const k of OBJ)s[k]=(raw[k]&&typeof raw[k]==='object'&&!Array.isArray(raw[k]))?raw[k]:{};
+    return s;
+  }
+  function load(storage){
+    const rawStr=storage.getItem(KEY);
+    if(rawStr==null)return blank();
+    let raw=null,parsed=true;
+    try{raw=JSON.parse(rawStr);}catch(e){parsed=false;}
+    const s=parsed?validate(raw):null;
+    if(!s){try{storage.setItem(BAK,rawStr);}catch(e){}return blank();}
+    return s;
+  }
+  function save(state,storage){storage.setItem(KEY,JSON.stringify(state));}
+  function exportJson(state){return JSON.stringify(state);}
+  function importJson(str){let raw;try{raw=JSON.parse(str);}catch(e){return null;}return validate(raw);}
+  return {KEY,BAK,blank,validate,load,save,exportJson,importJson};
+})();
+</script>
+<script id="ui">
+window.App=(function(){
+  let S=Store.load(localStorage);
+  let tab='home';
+  const $=s=>document.querySelector(s);
+  function save(){Store.save(S,localStorage);}
+  function el(html){const t=document.createElement('template');t.innerHTML=html.trim();return t.content.firstChild;}
+  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+  function toast(msg){const t=el('<div class="toast"></div>');t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),1800);}
+  function ask(msg){return window.confirm(msg);}
+  function openSheet(title,bodyHtml){closeSheet();const root=$('#sheetRoot');
+    const mask=el('<div class="sheet-mask"></div>');mask.onclick=()=>closeSheet();
+    const sheet=el('<div class="sheet"><h2></h2><div class="sheet-body"></div></div>');
+    sheet.querySelector('h2').textContent=title;
+    sheet.querySelector('.sheet-body').innerHTML=bodyHtml;
+    root.append(mask,sheet);}
+  function closeSheet(){$('#sheetRoot').innerHTML='';}
+  // 通用表单：fields [{key,label,type:'text|number|date|dt|select|textarea',options,required,min,max,step,placeholder,value}]
+  // type 'dt' 渲染 datetime-local，读取时 T→空格
+  function openForm(o){
+    openSheet(o.title,o.fields.map(f=>{
+      let inp;
+      if(f.type==='select')inp='<select data-k="'+f.key+'">'+f.options.map(x=>'<option value="'+x.v+'"'+(f.value===x.v?' selected':'')+'>'+x.t+'</option>').join('')+'</select>';
+      else if(f.type==='textarea')inp='<textarea data-k="'+f.key+'" rows="2" placeholder="'+(f.placeholder||'')+'">'+esc(f.value||'')+'</textarea>';
+      else inp='<input data-k="'+f.key+'" type="'+(f.type==='dt'?'datetime-local':(f.type||'text'))+'" value="'+(f.value!=null?String(f.value).replace(' ','T'):'')+'" placeholder="'+(f.placeholder||'')+'"'+(f.step?' step="'+f.step+'"':'')+'>';
+      return '<div class="frow"><label>'+f.label+'</label>'+inp+'<div class="err" data-err="'+f.key+'"></div></div>';
+    }).join('')+'<button class="btn" id="formOk">保存</button>');
+    $('#formOk').onclick=()=>{
+      const vals={};let bad=false;
+      for(const f of o.fields){
+        const node=document.querySelector('[data-k="'+f.key+'"]');let v=node.value.trim();
+        if(f.type==='dt')v=v.replace('T',' ');
+        const errEl=document.querySelector('[data-err="'+f.key+'"]');errEl.style.display='none';
+        if(f.required&&!v){errEl.textContent='必填';errEl.style.display='block';bad=true;continue;}
+        if(f.type==='number'&&v!==''){
+          const n=Number(v);
+          if(isNaN(n)||(f.min!=null&&n<f.min)||(f.max!=null&&n>f.max)){errEl.textContent='需在 '+(f.min!=null?f.min:'')+' ~ '+(f.max!=null?f.max:'')+' 之间';errEl.style.display='block';bad=true;continue;}
+        }
+        vals[f.key]=(f.type==='number')?(v===''?null:Number(v)):v;
+      }
+      if(bad)return;
+      closeSheet();o.onSubmit(vals);
+    };
+  }
+  function upsert(arr,rec){const i=arr.findIndex(x=>x.id===rec.id);if(i>=0)arr[i]=rec;else arr.push(rec);
+    const k=r=>r.dt||r.date||r.start||'';arr.sort((a,b)=>k(a)<k(b)?-1:1);}
+  function switchTab(t){
+    tab=t;
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.t===t));
+    document.querySelectorAll('.screen').forEach(s=>s.hidden=s.id!=='screen-'+t);
+    renderTab();window.scrollTo(0,0);
+  }
+  function renderTab(){
+    Charts.destroy();
+    $('#appTitle').textContent={home:'今日',records:'记录',growth:'成长',vaccine:'疫苗',mom:'妈妈'}[tab];
+    const b=S.profile&&S.profile.birthDate;
+    if(b){const t=L.todayStr(),st=L.ppStage(b,t);
+      $('#appSub').textContent=(S.profile.babyName||'宝宝')+' '+L.ageInDays(b,t)+'天 · '+st.label;}
+    else $('#appSub').textContent='';
+    ({home:renderHome,records:renderRecords,growth:renderGrowth,vaccine:renderVaccine,mom:renderMom})[tab]();
+  }
+  function renderHome(){
+    const t=L.todayStr(),b=S.profile.birthDate;
+    const st=L.ppStage(b,t);
+    const dueList=DATA.vaccines.map(v=>({v,st:L.vaccineStatus(v,S.vaccineRecords[v.key],b,t)}))
+      .filter(x=>x.st.status==='due'||x.st.status==='soon')
+      .sort((a,c)=>(a.st.status==='due'?0:1)-(c.st.status==='due'?0:1));
+    const fs=L.feedingSum(S.feedings,t);
+    const diet=DATA.diet[st.id][(S.dietChoice[t]!=null?S.dietChoice[t]:L.parseDate(t).getDay())%DATA.diet[st.id].length];
+    const tasks=(DATA.tasks[st.id]||[]).filter(x=>!x.cOnly||S.profile.delivery==='c-section');
+    const done=S.checks[t]||[];
+    $('#screen-home').innerHTML=
+      (dueList.length?'<div class="banner" id="vacBanner">💉 '+dueList.slice(0,2).map(x=>x.v.name+(x.st.status==='due'?'(已到)':'(临近)')).join('、')+(dueList.length>2?' 等':'')+' — 点击查看</div>':'')+
+      '<div class="quick"><button data-q="feed">🍼 记吃奶</button><button data-q="sleep">😴 记睡觉</button><button data-q="diaper">🧷 换尿布</button></div>'+
+      '<div class="card"><h3>今日吃奶</h3><div class="stat">'+
+        '<div class="s"><b>'+fs.count+'</b><span>次数</span></div>'+
+        '<div class="s"><b>'+(fs.ml||'—')+'</b><span>总奶量ml</span></div>'+
+        '<div class="s"><b>'+(fs.last?fs.last.slice(11):'—')+'</b><span>最近一次</span></div></div></div>'+
+      '<div class="card"><h3>今日食谱 <span class="more" id="goMom">详情 ›</span></h3>'+
+        [['breakfast','早餐'],['lunch','午餐'],['dinner','晚餐'],['snack','加餐']].map(kv=>'<div class="list-item"><b style="min-width:3em">'+kv[1]+'</b><span style="text-align:right">'+diet[kv[0]].join('、')+'</span></div>').join('')+'</div>'+
+      '<div class="card"><h3>今日打卡 <span class="more">'+st.label+'</span></h3>'+
+        (tasks.length?tasks.map(x=>'<label class="checkline'+(done.includes(x.id)?' done':'')+'"><input type="checkbox" data-task="'+x.id+'"'+(done.includes(x.id)?' checked':'')+'>'+x.label+'</label>').join(''):'<div class="empty">本阶段暂无打卡任务</div>')+'</div>';
+    const vb=$('#vacBanner');if(vb)vb.onclick=()=>switchTab('vaccine');
+    $('#goMom').onclick=()=>switchTab('mom');
+    document.querySelectorAll('.quick button').forEach(btn=>btn.onclick=()=>openRecordForm(btn.dataset.q));
+    document.querySelectorAll('[data-task]').forEach(cb=>cb.onchange=()=>{
+      S.checks[t]=S.checks[t]||[];const d=S.checks[t];const i=d.indexOf(cb.dataset.task);
+      if(cb.checked&&i<0)d.push(cb.dataset.task);
+      if(!cb.checked&&i>=0)d.splice(i,1);
+      save();cb.closest('.checkline').classList.toggle('done',cb.checked);
+    });
+  }
+  const Charts={_p:null,_insts:[],
+    load(){if(!this._p)this._p=new Promise((res,rej)=>{const s=document.createElement('script');
+      s.src='https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+      s.onload=()=>res(window.Chart);s.onerror=()=>rej(new Error('cdn fail'));document.head.appendChild(s);});
+      return this._p;},
+    async draw(canvas,config){try{const C=await this.load();const ch=new C(canvas,config);this._insts.push(ch);}
+      catch(e){if(canvas&&canvas.parentNode)canvas.parentNode.innerHTML='<div class="empty">图表加载失败，请检查网络后重试</div>';}},
+    destroy(){this._insts.forEach(c=>{try{c.destroy();}catch(e){}});this._insts=[];}
+  };
+  const METHOD_T={breast:'亲喂',bottleM:'瓶喂母乳',formula:'配方奶'};
+  let recSeg='feed',recDate=null;
+  function renderRecords(){
+    recDate=recDate||L.todayStr();
+    $('#screen-records').innerHTML=
+      '<div class="seg" id="recSeg">'+['feed|吃奶','sleep|睡眠','diaper|尿布'].map(p=>{const kv=p.split('|');
+        return '<button data-s="'+kv[0]+'"'+(recSeg===kv[0]?' class="active"':'')+'>'+kv[1]+'</button>';}).join('')+'</div>'+
+      '<div class="card" style="display:flex;justify-content:space-between;align-items:center">'+
+        '<button class="btn sm ghost" id="dPrev">‹ 前一天</button><b id="dLabel"></b>'+
+        '<button class="btn sm ghost" id="dNext">后一天 ›</button></div>'+
+      '<div id="recBody"></div>';
+    $('#recSeg').querySelectorAll('button').forEach(b=>b.onclick=()=>{recSeg=b.dataset.s;renderRecords();});
+    $('#dPrev').onclick=()=>{recDate=L.fmtDate(new Date(L.parseDate(recDate).getTime()-86400000));renderRecords();};
+    $('#dNext').onclick=()=>{recDate=L.fmtDate(new Date(L.parseDate(recDate).getTime()+86400000));renderRecords();};
+    $('#dLabel').textContent=recDate+(recDate===L.todayStr()?' (今天)':'');
+    renderRecSeg();
+  }
+  function renderRecSeg(){if(recSeg==='feed')renderFeedSeg();else if(recSeg==='sleep')renderSleepSeg();else renderDiaperSeg();}
+  function renderFeedSeg(){
+    Charts.destroy();
+    const days=L.lastNDays(7,L.todayStr());
+    const list=S.feedings.filter(f=>f.dt.startsWith(recDate)).slice().reverse();
+    const fs=L.feedingSum(S.feedings,recDate);
+    const bar=L.daySeries(days,S.feedings,(f,d)=>f.dt.startsWith(d)?(f.ml||0):null);
+    const cnt=L.daySeries(days,S.feedings,(f,d)=>f.dt.startsWith(d)?1:null);
+    $('#recBody').innerHTML=
+      '<div class="card"><h3>'+recDate.slice(5)+' 汇总</h3><div class="stat">'+
+        '<div class="s"><b>'+fs.count+'</b><span>次数</span></div>'+
+        '<div class="s"><b>'+(fs.ml||'—')+'</b><span>总奶量ml</span></div>'+
+        '<div class="s"><b>'+(list.length?list.reduce((s,f)=>s+(f.durationMin||0),0):'—')+'</b><span>总时长min</span></div></div></div>'+
+      '<div class="card"><h3>近7天 · 每日总奶量(ml)</h3><canvas id="fBar" height="200"></canvas></div>'+
+      '<div class="card"><h3>近7天 · 每日次数</h3><canvas id="fCnt" height="200"></canvas></div>'+
+      '<div class="card"><h3>记录 <button class="btn sm" id="addFeed">＋ 记一笔</button></h3>'+
+        (list.length?list.map(f=>'<div class="list-item"><div><b>'+f.dt.slice(11)+'</b> '+METHOD_T[f.method]+
+          (f.ml?' '+f.ml+'ml':'')+' · '+f.durationMin+'min'+(f.method==='breast'&&f.side?' · '+({left:'左',right:'右',both:'双侧'}[f.side]||''):'')+
+          (f.note?'<div style="font-size:12px;color:var(--sub)">'+esc(f.note)+'</div>':'')+'</div>'+
+          '<div class="ops"><button data-edit="'+f.id+'">改</button><button data-del="'+f.id+'">删</button></div></div>').join('')
+          :'<div class="empty">当天还没有记录</div>')+'</div>';
+    $('#addFeed').onclick=()=>openRecordForm('feed');
+    bindOps($('#recBody'),S.feedings,'feed');
+    Charts.draw(document.getElementById('fBar'),{type:'bar',data:{labels:days.map(d=>d.slice(5)),datasets:[{data:bar,backgroundColor:'#E8876B',borderRadius:4}]},options:{plugins:{legend:{display:false}},devicePixelRatio:2}});
+    Charts.draw(document.getElementById('fCnt'),{type:'line',data:{labels:days.map(d=>d.slice(5)),datasets:[{data:cnt,borderColor:'#E8876B',pointBackgroundColor:'#E8876B',tension:.3}]},options:{plugins:{legend:{display:false}},devicePixelRatio:2}});
+  }
+  function renderSleepSeg(){
+    Charts.destroy();
+    const days=L.lastNDays(7,L.todayStr());
+    const list=S.sleeps.filter(x=>L.sleepDateKey(x)===recDate).slice().reverse();
+    const total=L.daySeries(days,S.sleeps,(x,d)=>L.sleepDateKey(x)===d?x.durationMin:null);
+    $('#recBody').innerHTML=
+      '<div class="card"><h3>'+recDate.slice(5)+' 睡眠</h3><div class="stat">'+
+        '<div class="s"><b>'+list.length+'</b><span>次数</span></div>'+
+        '<div class="s"><b>'+list.reduce((s,x)=>s+x.durationMin,0)+'</b><span>总时长min</span></div></div></div>'+
+      '<div class="card"><h3>近7天 · 每日总睡眠(min)</h3><canvas id="sBar" height="200"></canvas></div>'+
+      '<div class="card"><h3>记录 <button class="btn sm" id="addSleep">＋ 记一笔</button></h3>'+
+        (list.length?list.map(x=>'<div class="list-item"><div><b>'+x.start.slice(11)+'</b>~'+x.end.slice(11)+' · '+x.durationMin+'min'+
+          (x.note?'<div style="font-size:12px;color:var(--sub)">'+esc(x.note)+'</div>':'')+'</div>'+
+          '<div class="ops"><button data-edit="'+x.id+'">改</button><button data-del="'+x.id+'">删</button></div></div>').join('')
+          :'<div class="empty">当天还没有记录</div>')+'</div>';
+    $('#addSleep').onclick=()=>openRecordForm('sleep');
+    bindOps($('#recBody'),S.sleeps,'sleep');
+    Charts.draw(document.getElementById('sBar'),{type:'bar',data:{labels:days.map(d=>d.slice(5)),datasets:[{data:total,backgroundColor:'#9BB8D9',borderRadius:4}]},options:{plugins:{legend:{display:false}},devicePixelRatio:2}});
+  }
+  function renderDiaperSeg(){
+    Charts.destroy();
+    const days=L.lastNDays(7,L.todayStr());
+    const list=S.diapers.filter(x=>x.dt.startsWith(recDate)).slice().reverse();
+    const cnt=L.daySeries(days,S.diapers,(x,d)=>x.dt.startsWith(d)?1:null);
+    const T={wet:'小便',soiled:'大便',both:'都有'};
+    $('#recBody').innerHTML=
+      '<div class="card"><h3>'+recDate.slice(5)+' 尿布 <button class="btn sm" id="addDiaper" style="float:right">＋ 记一笔</button></h3>'+
+        (list.length?list.map(x=>'<div class="list-item"><div><b>'+x.dt.slice(11)+'</b> '+T[x.type]+(x.stool?' · '+esc(x.stool):'')+
+          (x.note?'<div style="font-size:12px;color:var(--sub)">'+esc(x.note)+'</div>':'')+'</div>'+
+          '<div class="ops"><button data-edit="'+x.id+'">改</button><button data-del="'+x.id+'">删</button></div></div>').join('')
+          :'<div class="empty">当天还没有记录</div>')+'</div>'+
+      '<div class="card"><h3>近7天 · 每日次数</h3><canvas id="dCnt" height="200"></canvas></div>';
+    $('#addDiaper').onclick=()=>openRecordForm('diaper');
+    bindOps($('#recBody'),S.diapers,'diaper');
+    Charts.draw(document.getElementById('dCnt'),{type:'line',data:{labels:days.map(d=>d.slice(5)),datasets:[{data:cnt,borderColor:'#9BB8D9',pointBackgroundColor:'#9BB8D9',tension:.3}]},options:{plugins:{legend:{display:false}},devicePixelRatio:2}});
+  }
+  function bindOps(scope,arr,kind){
+    scope.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{
+      if(!ask('删除这条记录？'))return;
+      const i=arr.findIndex(x=>x.id===b.dataset.del);if(i>=0)arr.splice(i,1);
+      save();renderTab();
+    });
+    scope.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>{
+      const rec=arr.find(x=>x.id===b.dataset.edit);if(rec)openRecordForm(kind,rec);
+    });
+  }
+  function openRecordForm(kind,edit){
+    const now=L.nowStr();
+    if(kind==='feed'){
+      const f=edit||{};
+      openForm({title:(edit?'编辑':'')+'🍼 记吃奶',fields:[
+        {key:'dt',label:'时间',type:'dt',required:true,value:f.dt||now},
+        {key:'method',label:'方式',type:'select',options:[{v:'breast',t:'亲喂母乳'},{v:'bottleM',t:'瓶喂母乳'},{v:'formula',t:'配方奶'}],value:f.method||'formula'},
+        {key:'ml',label:'奶量 ml（亲喂可估填）',type:'number',min:0,max:350,value:f.ml},
+        {key:'durationMin',label:'时长 分钟',type:'number',min:0,max:120,required:true,value:f.durationMin},
+        {key:'side',label:'单双侧（亲喂）',type:'select',options:[{v:'',t:'—'},{v:'left',t:'仅左侧'},{v:'right',t:'仅右侧'},{v:'both',t:'双侧'}],value:f.side||''},
+        {key:'note',label:'备注',type:'textarea',value:f.note||''}
+      ],onSubmit:v=>{
+        if(v.method!=='breast'&&v.ml==null){toast('瓶喂请填奶量');return;}
+        let endDt=v.dt;
+        if(v.durationMin>0){const d=L.parseDt(v.dt);d.setMinutes(d.getMinutes()+v.durationMin);endDt=L.fmtDt(d);}
+        upsert(S.feedings,{id:f.id||L.uid(),dt:v.dt,method:v.method,ml:v.ml||0,durationMin:v.durationMin,endDt,side:v.side||null,note:v.note});
+        save();renderTab();toast('已保存');
+      }});
+    }
+    if(kind==='sleep'){
+      const f=edit||{};
+      openForm({title:(edit?'编辑':'')+'😴 记睡眠',fields:[
+        {key:'start',label:'开始时间',type:'dt',required:true,value:f.start||now},
+        {key:'end',label:'结束时间',type:'dt',required:true,value:f.end||''},
+        {key:'note',label:'备注',type:'textarea',value:f.note||''}
+      ],onSubmit:v=>{
+        const m=L.sleepMin(v.start,v.end);
+        if(m<=0){toast('结束时间需晚于开始时间');return;}
+        upsert(S.sleeps,{id:f.id||L.uid(),start:v.start,end:v.end,durationMin:m,note:v.note});
+        save();renderTab();toast('已保存');
+      }});
+    }
+    else if(kind==='diaper'){
+      const f=edit||{};
+      openForm({title:(edit?'编辑':'')+'🧷 记尿布',fields:[
+        {key:'dt',label:'时间',type:'dt',required:true,value:f.dt||now},
+        {key:'type',label:'类型',type:'select',options:[{v:'wet',t:'小便'},{v:'soiled',t:'大便'},{v:'both',t:'都有'}],value:f.type||'wet'},
+        {key:'stool',label:'大便性状（如有）',type:'select',options:[{v:'',t:'—'},{v:'黄糊',t:'黄糊'},{v:'绿色',t:'绿色'},{v:'稀水',t:'稀水'},{v:'干硬',t:'干硬'},{v:'血丝(建议就医)',t:'血丝(建议就医)'}],value:f.stool||''},
+        {key:'note',label:'备注',type:'textarea',value:f.note||''}
+      ],onSubmit:v=>{
+        upsert(S.diapers,{id:f.id||L.uid(),dt:v.dt,type:v.type,stool:v.type==='wet'?'':v.stool,note:v.note});
+        save();renderTab();toast('已保存');
+      }});
+    }
+    else if(kind==='growth'){
+      const f=edit||{};
+      openForm({title:(edit?'编辑':'')+'📏 记生长',fields:[
+        {key:'date',label:'日期',type:'date',required:true,value:f.date||L.todayStr()},
+        {key:'weightKg',label:'体重 kg',type:'number',min:2,max:8,step:0.01,value:f.weightKg},
+        {key:'heightCm',label:'身高 cm',type:'number',min:40,max:100,step:0.1,value:f.heightCm},
+        {key:'headCm',label:'头围 cm（选填）',type:'number',min:30,max:50,step:0.1,value:f.headCm},
+        {key:'note',label:'备注',type:'textarea',value:f.note||''}
+      ],onSubmit:v=>{
+        if(v.weightKg==null&&v.heightCm==null){toast('体重身高至少填一项');return;}
+        upsert(S.growth,{id:f.id||L.uid(),date:v.date,weightKg:v.weightKg,heightCm:v.heightCm,headCm:v.headCm,note:v.note});
+        save();renderTab();toast('已保存');
+      }});
+    }
+    else if(kind==='recovery'){
+      const f=edit||{};
+      openForm({title:(edit?'编辑':'')+'👩 记恢复',fields:[
+        {key:'date',label:'日期',type:'date',required:true,value:f.date||L.todayStr()},
+        {key:'weightKg',label:'体重 kg（选填）',type:'number',min:30,max:120,step:0.1,value:f.weightKg},
+        {key:'lochia',label:'恶露',type:'select',options:[{v:'',t:'—'},{v:'鲜红',t:'鲜红'},{v:'淡红',t:'淡红'},{v:'浆液色',t:'浆液色'},{v:'白色',t:'白色'},{v:'已干净',t:'已干净'}],value:f.lochia||''},
+        {key:'wound',label:'伤口/疤痕',type:'select',options:[{v:'',t:'—'},{v:'干燥愈合',t:'干燥愈合'},{v:'轻微发红',t:'轻微发红'},{v:'红肿渗液',t:'红肿渗液(建议就医)'}],value:f.wound||''},
+        {key:'note',label:'备注',type:'textarea',value:f.note||''}
+      ],onSubmit:v=>{
+        upsert(S.recovery,{id:f.id||L.uid(),date:v.date,weightKg:v.weightKg,lochia:v.lochia,wound:v.wound,note:v.note});
+        save();renderTab();toast('已保存');
+      }});
+    }
+  }
+  function renderGrowth(){
+    Charts.destroy();
+    const b=S.profile.birthDate,t=L.todayStr();
+    const months=L.ageInMonths(b,t);
+    const solid=L.solidsStage(months,DATA.solids);
+    const list=S.growth.slice().reverse();
+    $('#screen-growth').innerHTML=
+      '<div class="card"><h3>生长记录 <button class="btn sm" id="addG">＋ 记一笔</button></h3>'+
+        (list.length?list.map(g=>'<div class="list-item"><div><b>'+g.date.slice(5)+'</b> '+(g.weightKg!=null?g.weightKg+'kg':'')+(g.heightCm!=null?' · '+g.heightCm+'cm':'')+(g.headCm!=null?' · 头围'+g.headCm+'cm':'')+
+          (g.note?'<div style="font-size:12px;color:var(--sub)">'+esc(g.note)+'</div>':'')+'</div>'+
+          '<div class="ops"><button data-edit="'+g.id+'">改</button><button data-del="'+g.id+'">删</button></div></div>').join('')
+          :'<div class="empty">还没有记录，从出生体重身高开始吧</div>')+'</div>'+
+      '<div class="card"><h3>体重曲线</h3><canvas id="wChart" height="230"></canvas><div class="warn-note">参考线 P3/P25/P50/P75/P97 · WHO 2006 '+({girl:'女',boy:'男'}[S.profile.gender])+'童标准，仅供参考</div></div>'+
+      '<div class="card"><h3>身高曲线</h3><canvas id="hChart" height="230"></canvas></div>'+
+      '<div class="card" id="solidCard"></div>';
+    $('#addG').onclick=()=>openRecordForm('growth');
+    bindOps($('#screen-growth'),S.growth,'growth');
+    drawWho('wChart','weight');drawWho('hChart','height');
+    renderSolids(solid,months,b);
+  }
+  function drawWho(canvasId,metric){
+    const b=S.profile.birthDate;
+    const ps=L.whoPercentiles(DATA.who,S.profile.gender,metric);
+    const colors={p3:'#EFD9D2',p25:'#EAC3B8',p50:'#E5A89A',p75:'#EAC3B8',p97:'#EFD9D2'};
+    const datasets=['p3','p25','p50','p75','p97'].map(p=>({data:ps.ages.map((a,i)=>({x:a,y:ps.series[p][i]})),borderColor:colors[p],borderWidth:1,pointRadius:0,tension:.3}));
+    const pts=S.growth.slice().sort((a,c)=>a.date<c.date?-1:1)
+      .map(g=>({x:+(L.ageInDays(b,g.date)/30.4375).toFixed(2),y:metric==='weight'?g.weightKg:g.heightCm}))
+      .filter(p=>p.y!=null);
+    if(pts.length)datasets.push({data:pts,borderColor:'#E8876B',borderWidth:2.5,pointRadius:3.5,pointBackgroundColor:'#E8876B',tension:.2});
+    Charts.draw(document.getElementById(canvasId),{type:'line',data:{datasets},
+      options:{parsing:false,devicePixelRatio:2,plugins:{legend:{display:false}},
+        scales:{x:{type:'linear',min:0,max:24,title:{display:true,text:'月龄'}},y:{title:{display:true,text:metric==='weight'?'kg':'cm'}}}}});
+  }
+  function renderSolids(solid,months,b){
+    const c=$('#solidCard');
+    if(!solid){c.innerHTML='<h3>辅食</h3><div class="empty">宝宝 '+months+' 个月大，距辅食添加（满6月龄）还有 '+L.daysBetween(L.todayStr(),L.addMonths(b,6))+' 天</div>';return;}
+    const log=S.foodLog.slice().reverse().slice(0,7);
+    c.innerHTML='<h3>辅食 · '+solid.title+'</h3><div><span class="chip">'+solid.texture+'</span></div>'+
+      '<div class="article"><h4>添加原则</h4><ul>'+solid.principles.map(p=>'<li>'+p+'</li>').join('')+'</ul></div>'+
+      solid.plans.map((p,i)=>'<div class="article"><h4>方案'+(i+1)+'</h4><ul><li>主食：'+p.main+'</li><li>蔬菜：'+p.veg+'</li><li>水果：'+p.fruit+'</li><li>其他：'+p.other+'</li></ul></div>').join('')+
+      '<div class="article"><h4>今天实际吃了</h4></div>'+
+      '<div style="display:flex;gap:8px"><input id="foodInput" placeholder="如：米粉2勺+南瓜泥" style="flex:1;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:14px"><button class="btn sm" id="foodAdd">记</button></div>'+
+      (log.length?'<div style="margin-top:8px">'+log.map(x=>'<div class="list-item"><span>'+x.date.slice(5)+' '+esc(x.content)+'</span><div class="ops"><button data-fl="'+x.id+'">删</button></div></div>').join('')+'</div>':'');
+    $('#foodAdd').onclick=()=>{const v=$('#foodInput').value.trim();if(!v)return;
+      S.foodLog.push({id:L.uid(),date:L.todayStr(),content:v});save();renderTab();};
+    document.querySelectorAll('[data-fl]').forEach(btn=>btn.onclick=()=>{
+      if(!ask('删除？'))return;S.foodLog=S.foodLog.filter(x=>x.id!==btn.dataset.fl);save();renderTab();});
+  }
+  function renderVaccine(){
+    const b=S.profile.birthDate,t=L.todayStr();
+    const rank={due:0,soon:1,future:2,done:3};
+    const stT={due:'该打了',soon:'临近',future:'未到',done:'已接种'};
+    const rows=DATA.vaccines.map(v=>({v,st:L.vaccineStatus(v,S.vaccineRecords[v.key],b,t)}));
+    rows.sort((a,c)=>rank[a.st.status]-rank[c.st.status]||a.v.month-c.v.month);
+    const doneN=rows.filter(r=>r.st.status==='done').length;
+    const item=r=>'<div class="list-item" data-vk="'+r.v.key+'" style="cursor:pointer"><div><b>'+r.v.name+'</b> <span class="chip '+(r.v.type==='free'?'free':'paid')+'">'+(r.v.type==='free'?'免费':'自费')+'</span>'+
+      '<div style="font-size:12px;color:var(--sub)">'+r.v.month+'月龄 · '+r.v.dose+' · 应种 '+r.st.dueDate+(r.st.status==='done'&&S.vaccineRecords[r.v.key]?' · 实种 '+S.vaccineRecords[r.v.key].date:'')+(r.v.note?'<br>'+r.v.note:'')+'</div></div>'+
+      '<span class="chip" style="'+(r.st.status==='due'?'background:#FDECEA;color:#B03A34':(r.st.status==='done'?'background:#E8F4EC;color:#3E7D5C':''))+'">'+stT[r.st.status]+'</span></div>';
+    const within=rows.filter(r=>r.v.month<=24),later=rows.filter(r=>r.v.month>24);
+    $('#screen-vaccine').innerHTML=
+      '<div class="card"><h3>接种进度</h3><div class="stat">'+
+        '<div class="s"><b>'+doneN+'</b><span>已完成剂次</span></div>'+
+        '<div class="s"><b>'+rows.length+'</b><span>总剂次</span></div>'+
+        '<div class="s"><b>'+rows.filter(r=>r.st.status==='due').length+'</b><span>待接种</span></div></div>'+
+        '<div class="warn-note">点击任意疫苗可标记接种/取消；提醒按应种月龄推算，仅供参考，以接种门诊通知为准</div></div>'+
+      '<div class="card"><h3>24月龄内</h3>'+within.map(item).join('')+'</div>'+
+      '<div class="card"><h3>2岁以后 <button class="btn sm ghost" id="moreVac">展开/收起</button></h3><div id="laterList" style="display:none">'+later.map(item).join('')+'</div></div>';
+    $('#moreVac').onclick=()=>{const l=$('#laterList');l.style.display=l.style.display==='none'?'':'none';};
+    document.querySelectorAll('[data-vk]').forEach(n=>n.onclick=()=>{
+      const key=n.dataset.vk,v=DATA.vaccines.find(x=>x.key===key),rec=S.vaccineRecords[key];
+      openSheet(v.name,
+        '<div class="frow"><label>状态</label>'+(rec&&rec.done?'<button class="btn ghost" id="vCancel">取消接种标记</button>':'<button class="btn" id="vDone">✓ 标记已接种</button>')+'</div>'+
+        '<div class="frow"><label>实际接种日期</label><input type="date" id="vDate" value="'+((rec&&rec.date)||L.todayStr())+'"></div>'+
+        '<div class="frow"><label>备注</label><textarea id="vNote" rows="2">'+esc((rec&&rec.note)||'')+'</textarea></div>');
+      const ok=$('#vDone');if(ok)ok.onclick=()=>{S.vaccineRecords[key]={done:true,date:$('#vDate').value||L.todayStr(),note:$('#vNote').value};save();closeSheet();renderTab();toast('已记录');};
+      const cc=$('#vCancel');if(cc)cc.onclick=()=>{delete S.vaccineRecords[key];save();closeSheet();renderTab();toast('已取消');};
+    });
+  }
+  let momPlan=null,momPlanDay=null;
+  function renderMom(){
+    Charts.destroy();
+    const b=S.profile.birthDate,t=L.todayStr();
+    if(momPlanDay!==t){momPlan=null;momPlanDay=t;}
+    const st=L.ppStage(b,t);
+    if(momPlan==null)momPlan=S.dietChoice[t]!=null?S.dietChoice[t]:null;
+    const plans=DATA.diet[st.id];
+    if(momPlan==null)momPlan=L.parseDate(t).getDay()%plans.length;
+    momPlan=((momPlan%plans.length)+plans.length)%plans.length;
+    const plan=plans[momPlan];
+    const care=DATA.care[st.id];
+    const isC=S.profile.delivery==='c-section';
+    const recList=S.recovery.slice().reverse().slice(0,7);
+    const ws=S.recovery.slice().sort((a,c)=>a.date<c.date?-1:1).filter(r=>r.weightKg!=null);
+    $('#screen-mom').innerHTML=
+      '<div class="card"><h3>我的食谱</h3><div style="margin-bottom:8px"><span class="chip">'+st.label+'</span></div>'+
+        '<div class="seg">'+plans.map((p,i)=>'<button data-p="'+i+'" style="flex:0 0 auto;padding:8px 14px"'+(i===momPlan?' class="active"':'')+'>方案'+(i+1)+'</button>').join('')+'</div>'+
+        [['breakfast','早餐'],['lunch','午餐'],['dinner','晚餐'],['snack','加餐']].map(kv=>'<div class="list-item"><b style="min-width:3em">'+kv[1]+'</b><span style="text-align:right">'+plan[kv[0]].join('、')+'</span></div>').join('')+
+        '<div class="warn-note">'+DATA.stages.find(x=>x.id===st.id).dietFocus+'</div></div>'+
+      '<div class="card"><h3>恢复记录 <button class="btn sm" id="addRec">＋ 记一笔</button></h3>'+
+        (recList.length?recList.map(r=>'<div class="list-item"><div><b>'+r.date.slice(5)+'</b>'+(r.weightKg!=null?' · '+r.weightKg+'kg':'')+(r.lochia?' · 恶露'+r.lochia:'')+(r.wound?' · 伤口'+r.wound:'')+
+          (r.note?'<div style="font-size:12px;color:var(--sub)">'+esc(r.note)+'</div>':'')+'</div>'+
+          '<div class="ops"><button data-edit="'+r.id+'">改</button><button data-del="'+r.id+'">删</button></div></div>').join('')
+          :'<div class="empty">记录体重、恶露、伤口情况</div>')+
+        (ws.length>=2?'<canvas id="momW" height="160"></canvas>':'')+'</div>'+
+      '<div class="card"><h3>护理指引 · '+care.title+'</h3><div class="article"><h4>护理要点</h4><ul>'+care.points.map(p=>'<li>'+p+'</li>').join('')+'</ul>'+
+        (isC&&care.cSection&&care.cSection.length?'<h4>剖腹产专项</h4><ul>'+care.cSection.map(p=>'<li>'+p+'</li>').join('')+'</ul>':'')+
+        '<div class="warn-note">仅供参考，不构成医疗建议，遵医嘱</div></div></div>'+
+      '<div class="card"><h3>哺乳安全速查</h3><input id="safetyQ" placeholder="搜索药物/食物，如：布洛芬" style="width:100%;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:14px"><div id="safetyList" style="margin-top:8px"></div><div class="warn-note">仅供参考，不构成医疗建议，用药请遵医嘱</div></div>'+
+      '<div class="card"><h3>设置</h3>'+
+        '<button class="btn ghost" id="editProfile">编辑宝宝/妈妈资料</button>'+
+        '<button class="btn ghost" id="exportBtn">导出数据备份(JSON)</button>'+
+        '<button class="btn ghost" id="importBtn">导入数据</button>'+
+        '<button class="btn ghost" id="resetBtn" style="color:#B03A34">清空全部数据</button>'+
+        '<input type="file" id="impFile" accept=".json" hidden></div>';
+    document.querySelectorAll('[data-p]').forEach(btn=>btn.onclick=()=>{momPlan=+btn.dataset.p;S.dietChoice[t]=momPlan;save();renderMom();});
+    $('#addRec').onclick=()=>openRecordForm('recovery');
+    bindOps($('#screen-mom'),S.recovery,'recovery');
+    if(ws.length>=2)Charts.draw(document.getElementById('momW'),{type:'line',data:{labels:ws.map(r=>r.date.slice(5)),datasets:[{data:ws.map(r=>r.weightKg),borderColor:'#E8876B',pointBackgroundColor:'#E8876B',tension:.3}]},options:{plugins:{legend:{display:false}},devicePixelRatio:2}});
+    renderSafety('');$('#safetyQ').oninput=e=>renderSafety(e.target.value.trim());
+    $('#editProfile').onclick=editProfile;
+    $('#exportBtn').onclick=doExport;
+    $('#importBtn').onclick=()=>$('#impFile').click();
+    $('#impFile').onchange=importFile;
+    $('#resetBtn').onclick=()=>{if(ask('确定清空全部数据？建议先导出备份。')){localStorage.removeItem(Store.KEY);localStorage.removeItem(Store.BAK);location.reload();}};
+  }
+  function renderSafety(q){
+    const list=DATA.safety.filter(e=>!q||e.name.includes(q)||e.cat.includes(q));
+    $('#safetyList').innerHTML=list.length?list.map(e=>'<div class="list-item"><div><b>'+e.name+'</b> <span class="chip">'+e.cat+'</span><div style="font-size:12px;color:var(--sub)">'+e.note+'</div></div><span class="chip" style="background:#FBE9E2">'+e.level+'</span></div>').join(''):'<div class="empty">无匹配条目</div>';
+  }
+  function editProfile(){
+    const p=S.profile;
+    openForm({title:'编辑资料',fields:[
+      {key:'babyName',label:'宝宝昵称',value:p.babyName},
+      {key:'gender',label:'性别',type:'select',options:[{v:'girl',t:'女宝'},{v:'boy',t:'男宝'}],value:p.gender},
+      {key:'birthDate',label:'出生日期',type:'date',required:true,value:p.birthDate},
+      {key:'birthWeightKg',label:'出生体重 kg',type:'number',min:1,max:6,step:0.01,value:p.birthWeightKg},
+      {key:'birthHeightCm',label:'出生身高 cm',type:'number',min:40,max:60,step:0.1,value:p.birthHeightCm},
+      {key:'delivery',label:'分娩方式',type:'select',options:[{v:'vaginal',t:'顺产'},{v:'c-section',t:'剖腹产'}],value:p.delivery},
+      {key:'momWeightKg',label:'妈妈体重 kg（选填）',type:'number',min:35,max:120,step:0.1,value:p.momWeightKg}
+    ],onSubmit:v=>{S.profile=Object.assign({},p,v);save();momPlan=null;recDate=null;renderTab();toast('资料已更新，全App已联动');}});
+  }
+  function doExport(){
+    const blob=new Blob([Store.exportJson(S)],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='postpartum-backup-'+L.todayStr()+'.json';a.click();URL.revokeObjectURL(a.href);
+    toast('已导出');
+  }
+  function importFile(e){
+    const file=e.target.files[0];if(!file)return;
+    const r=new FileReader();
+    r.onload=()=>{const parsed=Store.importJson(String(r.result));
+      if(!parsed){toast('导入失败：文件格式不正确');return;}
+      if(!parsed.profile){toast('导入的文件缺少宝宝资料');return;}
+      S=parsed;save();momPlan=null;recDate=null;renderTab();toast('导入成功');};
+    r.readAsText(file);e.target.value='';
+  }
+  function renderWizard(){
+    $('#app').hidden=true;$('#wizard').hidden=false;
+    $('#wizard').innerHTML='<div class="wizard"><h1>欢迎使用 👶</h1><p class="tip">先填宝宝出生信息，食谱、疫苗、护理都会自动跟上</p>'+
+      '<div class="card">'+
+      '<div class="frow"><label>宝宝昵称</label><input id="w-name" placeholder="如：小汤圆"></div>'+
+      '<div class="frow"><label>性别</label><select id="w-gender"><option value="girl">女宝</option><option value="boy">男宝</option></select></div>'+
+      '<div class="frow"><label>出生日期</label><input id="w-birth" type="date"></div>'+
+      '<div class="frow"><label>出生体重 kg</label><input id="w-weight" type="number" min="1" max="6" step="0.01" placeholder="如 3.3"></div>'+
+      '<div class="frow"><label>出生身高 cm</label><input id="w-height" type="number" min="40" max="60" step="0.1" placeholder="如 50"></div>'+
+      '<div class="frow"><label>分娩方式</label><select id="w-delivery"><option value="vaginal">顺产</option><option value="c-section">剖腹产</option></select></div>'+
+      '<div class="frow"><label>妈妈体重 kg（选填）</label><input id="w-momw" type="number" min="35" max="120" step="0.1"></div>'+
+      '<button class="btn" id="w-ok">开始使用</button></div></div>';
+    $('#w-ok').onclick=()=>{
+      const birth=$('#w-birth').value;
+      if(!birth){toast('请填写出生日期');return;}
+      S.profile={babyName:$('#w-name').value.trim(),gender:$('#w-gender').value,birthDate:birth,
+        birthWeightKg:Number($('#w-weight').value)||0,birthHeightCm:Number($('#w-height').value)||0,
+        delivery:$('#w-delivery').value,momWeightKg:Number($('#w-momw').value)||0};
+      save();enterApp();
+    };
+  }
+  function enterApp(){
+    if(!S.profile){renderWizard();return;}
+    $('#wizard').hidden=true;$('#app').hidden=false;
+    $('#bottomnav').innerHTML=[['home','🏠','今日'],['records','🍼','记录'],['growth','📏','成长'],['vaccine','💉','疫苗'],['mom','👩','妈妈']]
+      .map(x=>'<div class="nav-item" data-t="'+x[0]+'"><span class="ico">'+x[1]+'</span>'+x[2]+'</div>').join('');
+    document.querySelectorAll('.nav-item').forEach(n=>n.onclick=()=>switchTab(n.dataset.t));
+    $('#fab').onclick=onFab;
+    switchTab('home');
+  }
+  function onFab(){
+    const map={home:'feed',records:(recSeg==='sleep'||recSeg==='diaper')?recSeg:'feed',growth:'growth',vaccine:'feed',mom:'recovery'};
+    openRecordForm(map[tab]);
+  }
+  document.addEventListener('DOMContentLoaded',()=>{ if(S.profile)enterApp(); else renderWizard(); });
+  return {get state(){return S;},switchTab,openSheet,closeSheet,toast};
+})();
+</script>
+</body>
+</html>
